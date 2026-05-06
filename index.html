@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTB Quiz — Year 1 Medicine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --border: #252a38;
+    --accent: #4f8ef7;
+    --accent2: #7c5cf6;
+    --green: #2ecc8a;
+    --red: #f05a5a;
+    --amber: #f5a623;
+    --text: #e8ecf4;
+    --muted: #7a8299;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  #score-display {
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  #score-display span {
+    background: var(--surface2);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    font-weight: 500;
+    color: var(--text);
+  }
+  #streak-badge {
+    background: linear-gradient(135deg, #f59e0b22, #f59e0b44);
+    border-color: #f59e0b55 !important;
+    color: #f5c55a !important;
+  }
+
+  /* ─── MAIN LAYOUT ────────────────────────────────── */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ─── HOME SCREEN ────────────────────────────────── */
+  #home-screen {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  #home-screen h2 {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+  #home-screen p {
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+  .topic-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .topic-chip:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+    transform: translateY(-1px);
+  }
+  .topic-chip.selected {
+    border-color: var(--accent);
+    background: #4f8ef712;
+  }
+  .topic-chip.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 0.5rem;
+    right: 0.6rem;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .topic-chip .icon { font-size: 1.1rem; margin-bottom: 0.35rem; }
+  .topic-chip .label { font-size: 0.82rem; font-weight: 500; color: var(--text); line-height: 1.3; }
+
+  .start-controls {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .mode-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    font-family: var(--sans);
+  }
+  .mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none;
+    padding: 0.85rem 2.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    font-family: var(--sans);
+    letter-spacing: 0.01em;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* ─── QUIZ SCREEN ────────────────────────────────── */
+  #quiz-screen { display: none; }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 999px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  .question-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .topic-tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.25rem;
+  }
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 0.25rem;
+  }
+  .question-note {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  /* MCQ OPTIONS */
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+  }
+  .option-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1.1rem;
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--text);
+    transition: all 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    line-height: 1.5;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+  .option-btn .opt-letter {
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+  }
+  .option-btn:hover:not(:disabled) .opt-letter {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .option-btn.correct {
+    border-color: var(--green);
+    background: #2ecc8a12;
+  }
+  .option-btn.correct .opt-letter {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: #f05a5a12;
+  }
+  .option-btn.wrong .opt-letter {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+  .option-btn.dimmed { opacity: 0.45; }
+  .option-btn:disabled { cursor: default; }
+
+  /* FREE RESPONSE */
+  .free-response-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .free-response-area textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .free-response-area textarea:focus { border-color: var(--accent); }
+
+  /* RESULT PANEL */
+  .result-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    display: none;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .result-panel.correct { border-color: var(--green); }
+  .result-panel.wrong   { border-color: var(--red); }
+  .result-panel.partial { border-color: var(--amber); }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .result-icon { font-size: 1.2rem; }
+  .result-body { font-size: 0.87rem; color: var(--muted); line-height: 1.7; }
+  .result-body strong { color: var(--text); }
+
+  .action-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .btn-secondary {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    font-family: var(--sans);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-submit {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    padding: 0.65rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: opacity 0.15s;
+    font-family: var(--sans);
+  }
+  .btn-submit:hover { opacity: 0.85; }
+
+  /* ─── LOADING OVERLAY ────────────────────────────── */
+  #loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0d0f14cc;
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-overlay p { color: var(--muted); font-size: 0.9rem; }
+
+  /* ─── RESULTS SCREEN ─────────────────────────────── */
+  #results-screen { display: none; text-align: center; padding: 3rem 0; }
+  #results-screen h2 { font-family: var(--serif); font-size: 2.2rem; margin-bottom: 0.5rem; }
+  .score-ring {
+    width: 120px;
+    height: 120px;
+    margin: 1.5rem auto;
+    position: relative;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring .score-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .score-ring .score-label { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .stats-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.5rem 0 2rem;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 1.25rem;
+    min-width: 100px;
+  }
+  .stat-box .stat-val { font-size: 1.4rem; font-weight: 700; }
+  .stat-box .stat-key { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .stat-box.good .stat-val { color: var(--green); }
+  .stat-box.bad .stat-val  { color: var(--red); }
+
+  /* ─── TOAST ───────────────────────────────────────── */
+  #toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    z-index: 200;
+    white-space: nowrap;
+  }
+  #toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* ─── MISC ────────────────────────────────────────── */
+  .select-all-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .text-muted { color: var(--muted); font-size: 0.85rem; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+  @media (max-width: 520px) {
+    header { padding: 1rem; }
+    main { padding: 1.25rem 1rem; }
+    .question-card { padding: 1.25rem 1.1rem; }
+    .topics-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚕ CTB Quiz</h1>
+  <div id="score-display">
+    <span id="hdr-q">Q 0/0</span>
+    <span id="hdr-score">Score: 0</span>
+    <span id="streak-badge" class="streak-badge" style="display:none">🔥 0</span>
+  </div>
+</header>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p id="loading-msg">Generating question…</p>
+</div>
+
+<div id="toast"></div>
+
+<main>
+
+<!-- ══════ HOME SCREEN ══════ -->
+<div id="home-screen">
+  <h2>Year 1 Medicine<br><em style="font-size:0.7em;opacity:0.6">CTB Exam Practice</em></h2>
+  <p>AI-generated questions straight from your notes. Pick topics, choose your mode, and go.</p>
+
+  <div class="select-all-row">
+    <button class="mode-btn" onclick="selectAll()">Select all</button>
+    <button class="mode-btn" onclick="selectNone()">Clear</button>
+  </div>
+
+  <div class="topics-grid" id="topics-grid"></div>
+
+  <div style="margin-bottom:1.25rem">
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;font-weight:500">Question type</p>
+    <div class="start-controls">
+      <button class="mode-btn active" id="mode-mcq" onclick="setMode('mcq')">Multiple Choice</button>
+      <button class="mode-btn" id="mode-free" onclick="setMode('free')">Short Answer</button>
+      <button class="mode-btn" id="mode-mix" onclick="setMode('mix')">Mixed</button>
+    </div>
+  </div>
+
+  <div style="margin-bottom:1.5rem">
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;font-weight:500">Number of questions</p>
+    <div class="start-controls">
+      <button class="mode-btn active" id="num-5" onclick="setNum(5)">5</button>
+      <button class="mode-btn" id="num-10" onclick="setNum(10)">10</button>
+      <button class="mode-btn" id="num-20" onclick="setNum(20)">20</button>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="start-btn" onclick="startQuiz()">Start Quiz</button>
+  <p class="text-muted" style="margin-top:0.75rem">Questions are generated fresh each time by AI</p>
+</div>
+
+<!-- ══════ QUIZ SCREEN ══════ -->
+<div id="quiz-screen">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <div class="question-meta">
+    <span class="topic-tag" id="q-topic-tag">Topic</span>
+    <span id="q-counter">1 / 10</span>
+  </div>
+
+  <div class="question-card">
+    <div class="question-text" id="q-text">Loading…</div>
+    <div class="question-note" id="q-note"></div>
+  </div>
+
+  <!-- MCQ OPTIONS -->
+  <div class="options-list" id="options-list"></div>
+
+  <!-- FREE RESPONSE -->
+  <div class="free-response-area" id="free-response-area" style="display:none">
+    <textarea id="free-answer" placeholder="Type your answer here…"></textarea>
+    <div class="action-row">
+      <button class="btn-submit" onclick="submitFreeAnswer()">Submit Answer</button>
+    </div>
+  </div>
+
+  <!-- RESULT PANEL -->
+  <div class="result-panel" id="result-panel">
+    <div class="result-header">
+      <span class="result-icon" id="result-icon"></span>
+      <span id="result-title"></span>
+    </div>
+    <div class="result-body" id="result-body"></div>
+  </div>
+
+  <div class="action-row" id="next-row" style="display:none">
+    <button class="btn-secondary" onclick="skipQuestion()">Skip</button>
+    <button class="btn-primary" onclick="nextQuestion()">Next Question →</button>
+  </div>
+</div>
+
+<!-- ══════ RESULTS SCREEN ══════ -->
+<div id="results-screen">
+  <h2 id="results-emoji">🎉</h2>
+  <h2 id="results-title">Quiz Complete!</h2>
+  <div class="score-ring">
+    <svg width="120" height="120" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#1a1e2a" stroke-width="10"/>
+      <circle id="score-arc" cx="60" cy="60" r="50" fill="none" stroke="#4f8ef7" stroke-width="10"
+              stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
+              style="transition: stroke-dashoffset 1s ease"/>
+    </svg>
+    <div class="score-text">
+      <span id="score-pct">0%</span>
+      <span class="score-label">score</span>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box good"><div class="stat-val" id="stat-correct">0</div><div class="stat-key">Correct</div></div>
+    <div class="stat-box bad"><div class="stat-val" id="stat-wrong">0</div><div class="stat-key">Wrong</div></div>
+    <div class="stat-box"><div class="stat-val" id="stat-streak">0</div><div class="stat-key">Best streak</div></div>
+  </div>
+  <p id="results-msg" style="color:var(--muted);margin-bottom:2rem;font-size:0.95rem"></p>
+  <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+    <button class="btn-secondary" onclick="goHome()">← Back to Topics</button>
+    <button class="btn-primary" onclick="startQuiz()">Play Again</button>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  NOTES DATA (embedded from your CTB PDF)
+// ─────────────────────────────────────────────────────────────
+const NOTES = `=== PAGE 1 ===
+Bone
+Bone remodelling 
+Bone resorption 
+Regulation
+
+=== PAGE 2 ===
+BONE REMODELLING OCCURS IN FIVE KEY STEPS
+1. Microdamage & Activation:
+o Bone experiences microdamage or stress, signalling the need for repair.
+o Osteoclasts are recruited to the site.
+2. Resorption (Bone Breakdown):
+o Osteoclasts break down bone matrix, creating resorption pits.
+o Minerals such as calcium and phosphate are released into the bloodstream.
+3. Reversal Phase:
+o Osteoclasts undergo apoptosis (programmed cell death).
+o Osteoblasts are recruited to the site to begin new bone formation.
+4. Formation (New Bone Synthesis):
+o Osteoblasts secrete osteoid (unmineralized bone matrix).
+o Osteoid gradually mineralizes, forming new bone.
+5. Quiescence (Resting Phase):
+o Osteoblasts mature into osteocytes, which become embedded in the bone.
+o Bone enters a stable resting phase until the next remodelling cycle is triggered.
+Key Concept: Bone resorption and formation are normally coupled to maintain bone strength and integrity.
+
+=== PAGE 3 ===
+BONE REGULATION AND RESORPTION
+1. PTH Binds to Osteoblast Receptors
+PTH binds to PTH1R receptors on osteoblasts (not osteoclasts directly).
+2. Osteoblasts Increase RANKL Production
+Osteoblasts release RANKL (Receptor Activator of Nuclear Factor Kappa-B Ligand).
+RANKL binds to RANK receptors on osteoclast progenitor cells.
+3. Osteoclast Differentiation & Activation
+RANKL-RANK interaction stimulates maturation of osteoclast progenitors into active multinucleated osteoclasts.
+4. Bone Resorption Releases Calcium & Phosphate
+Activated osteoclasts break down bone matrix, releasing Ca2+ and phosphate into the bloodstream.
+5. Regulation by OPG & Bisphosphonates
+Osteoprotegerin (OPG): A decoy receptor produced by osteoblasts that binds RANKL and prevents excessive bone resorption.
+Bisphosphonates: Inhibit osteoclast function, reducing bone resorption.
+Final Summary: PTH → Osteoblasts → RANKL release → Osteoclast activation → Bone resorption → increased Ca2+ & PO4 release into blood.
+
+=== PAGE 5 ===
+INTRAMEMBRANOUS OSSIFICATION
+- During foetal development, beginning around the 8th week of gestation.
+1. Mesenchymal Cell Differentiation: Mesenchymal cells cluster and differentiate into osteoblasts, forming the primary ossification centre.
+2. Secretion of Osteoid & Mineralization: Osteoblasts secrete osteoid. Osteoid becomes mineralized, trapping osteoblasts inside. Trapped osteoblasts mature into osteocytes.
+3. Formation of Woven Bone & Periosteum: The bone matrix forms trabeculae, creating a spongy structure.
+4. Formation of Compact Bone: The superficial layers of trabecular bone remodel into compact bone.
+Key Concept: Intramembranous ossification is how flat bones of the skull, clavicle, and mandible develop without a cartilage template.
+
+=== PAGE 7 ===
+ENDOCHONDRAL OSSIFICATION
+- Starts around the 8th–12th week of foetal development.
+1. Cartilage Model Formation: Mesenchymal cells differentiate into chondroblasts. A surrounding membrane, the perichondrium, develops.
+2. Growth of Cartilage Model: Chondroblasts become trapped and mature into chondrocytes. Chondrocytes hypertrophy, burst, triggering calcification.
+3. Formation of Bone Collar & Periosteum
+4. Primary Ossification Centre Formation (Diaphyseal Ossification): Blood vessels invade the cartilage model, bringing osteoprogenitor cells. Osteoblasts replace calcified cartilage by laying down woven bone.
+5. Medullary Cavity Formation & Bone Remodelling: Osteoclasts break down woven bone to form the medullary cavity.
+6. Secondary Ossification Centres (Epiphyseal Ossification): Develop in the epiphyses after birth. The epiphyseal growth plate remains, allowing for bone growth until adulthood.
+Key Concept: Endochondral ossification forms long bones (e.g., femur, tibia, humerus) using a cartilage template.
+
+=== PAGE 9 ===
+FRACTURE HEALING
+1. Haematoma Formation (Inflammatory Phase): Blood vessels rupture, leading to hematoma formation. Inflammatory response begins: neutrophils, macrophages, and osteoclasts remove bone debris.
+2. Granulation Tissue Formation: Fibroblasts produce collagen. New capillaries grow (angiogenesis).
+3. Fibrocartilaginous Callus Formation: Chondroblasts produce cartilage to bridge the broken bone ends.
+4. Bony Callus Formation: Fibrocartilaginous callus undergoes endochondral ossification, converting to woven bone.
+5. Remodelling Phase: Osteoclasts and osteoblasts remodel woven bone into lamellar bone. Medullary cavity is re-established.
+
+=== PAGE 10 ===
+ANGIOGENESIS
+In response to hypoxic conditions, VEGF is produced by mesenchymal cells. VEGF causes nearby intact vessels to dilate and become permeable.
+The basement membrane is digested by matrix metalloproteinases, allowing a sprout to form.
+Endothelial cells at the tip of the sprout migrate towards the area of tissue injury.
+The cells behind the tip proliferate and are remodelled into vascular tubes.
+Pericytes in capillaries or smooth muscle cells in larger vessels are recruited, eventually forming a complete vessel.
+
+=== PAGE 12 ===
+PTH REGULATION OF PHOSPHATE REABSORPTION IN THE KIDNEY
+1. Phosphate Reabsorption via Na+-Phosphate Cotransporter: Normally, about 70% of filtered phosphate is reabsorbed in the proximal convoluted tubule (PCT) via sodium-phosphate cotransporters.
+2. PTH Binds to PTH1R Receptors on PCT Cells: PTH binds to PTH1R (GPCR) on the basolateral membrane of proximal tubule cells.
+3. Activation of Adenylate Cyclase & cAMP Production: PTH activates adenylate cyclase, which converts ATP into cAMP. cAMP activates protein kinase A (PKA).
+4. Phosphorylation & Inhibition of Na+-Phosphate Cotransporter: PKA phosphorylates Na+-phosphate cotransporters (NaPi-2a & NaPi-2c), inhibiting phosphate reabsorption, leading to phosphaturia.
+ROLE OF FGF23: Produced by bone. Stimulated by high phosphate levels. Effects: Inhibits phosphate reabsorption in kidneys; Inhibits calcitriol (Vitamin D) production.
+
+=== PAGE 14 ===
+PTH SYNTHESIS AND SECRETION REGULATION
+Parathyroid gland chief cells have Ca2+-sensing receptors (CaSR, a GPCR).
+Normal or High Ca2+ → Low PTH secretion.
+Low Ca2+ (Hypocalcemia) → Rapid increase in PTH synthesis & secretion.
+High Ca2+ (Hypercalcemia) → Inhibition of PTH secretion.
+PTH Action on Bone: Stimulates osteoclast activity indirectly (via RANKL activation). Increases bone resorption, releasing Ca2+ & phosphate.
+PTH Action on Kidneys: Increases Ca2+ reabsorption in the DCT. Increases phosphate excretion in the PCT. Stimulates 1alpha-hydroxylase, converting 25-hydroxyvitamin D into active calcitriol.
+PTH Action on Intestines (via Vitamin D): Calcitriol increases Ca2+ absorption from the small intestine.
+
+=== PAGE 17 ===
+CALCIUM ABSORPTION IN THE INTESTINE
+Two Routes: Paracellular (Passive Diffusion) in jejunum & ileum; Transcellular (Active Transport) in duodenum - regulated by 1,25-dihydroxycholecalciferol (active Vitamin D).
+Entry Through the Luminal Membrane: TRPV6 Ca2+ channels facilitate calcium influx into enterocytes.
+Intracellular Transport: Calcium binds to calbindin-D28K, a cytosolic calcium-binding protein.
+Basolateral Transport: Ca2+-ATPase (PMCA1b) - primary active transport; Na+/Ca2+ exchanger (NCX1) - secondary active transport.
+Role of Vitamin D: Upregulates TRPV6 channels, calbindin, and basolateral transporters.
+
+=== PAGE 19 ===
+ACIDEMIA AND ALKALEMIA EFFECTS ON IONIZED CALCIUM
+Acidemia (low pH) → Increased Ionized [Ca2+]:
+H+ ions compete with Ca2+ for binding sites on albumin. H+ binds to albumin, displacing Ca2+. This increases the free ionized calcium.
+Alkalemia (high pH) → Decreased Ionized [Ca2+]:
+Fewer H+ ions mean less competition for albumin binding sites. More Ca2+ binds to albumin, reducing free ionized calcium.
+Result: Symptoms of hypocalcemia such as tetany, muscle cramps, tingling (Trousseau's & Chvostek's signs).
+
+=== PAGE 20 ===
+PRIMARY HYPERPARATHYROIDISM
+Cause: Overproduction of PTH due to parathyroid gland adenoma (80%) or diffuse hyperplasia (15%).
+Pathophysiology: Parathyroid glands fail to respond to high calcium. Excess PTH increases bone resorption, leading to hypercalcemia. Increased renal excretion of phosphate causes hypophosphatemia. Chronic bone demineralization can cause osteoporosis.
+Can cause kidney stones (nephrolithiasis) due to high calcium levels.
+
+SECONDARY HYPERPARATHYROIDISM
+Cause: Chronic hypocalcemia leading to parathyroid hyperplasia.
+Due to: Vitamin D deficiency or Chronic kidney disease (CKD).
+In CKD: Phosphate retention → Hyperphosphatemia; Decreased activation of vitamin D → Low calcium absorption.
+
+=== PAGE 22 ===
+NEUROTRANSMITTER RELEASE FROM THE PRE-SYNAPTIC MEMBRANE
+1. Vesicle Docking: Synaptic vesicles are transported to the active zone. v-SNARE proteins (synaptobrevin, synaptotagmin) on vesicles interact with t-SNARE proteins (syntaxin, SNAP-25) on the pre-synaptic membrane.
+2. Calcium Influx: Action potential reaches the pre-synaptic terminal, causing depolarization. Depolarization opens voltage-gated calcium channels (VGCCs), allowing Ca2+ to enter. Ca2+ binds to synaptotagmin, initiating vesicle fusion. This step is fast (within 0.2 ms).
+3. Neurotransmitter Release and Inactivation: Synaptic vesicles fuse with the pre-synaptic membrane, releasing neurotransmitters into the synaptic cleft via calcium-dependent exocytosis. Inactivation: Reuptake into the pre-synaptic terminal; Enzymatic degradation (acetylcholinesterase); Diffusion.
+Botulinum toxin prevents neurotransmitter release by cleaving SNARE proteins.
+
+=== PAGE 25 ===
+SKELETAL MUSCLE CONTRACTION
+1. Excitation-Contraction Coupling: Action potential depolarizes the sarcolemma. Propagates down T-tubules, activating dihydropyridine receptors (DHP receptors). DHP receptors activate ryanodine receptors (RyR) on the sarcoplasmic reticulum. Ca2+ is released from the SR, increasing intracellular Ca2+.
+2. Cross-Bridge Formation: Ca2+ binds to troponin C, causing tropomyosin to shift. This exposes myosin-binding sites on actin. Myosin heads bind to actin, forming cross-bridges.
+3. Cross-Bridge Cycling: Pi release from myosin strengthens binding. Power stroke occurs - myosin pulls actin towards sarcomere center. ADP is released, completing the power stroke.
+4. Detachment: ATP binds to myosin, causing it to detach from actin. ATP is hydrolyzed to ADP + Pi, resetting myosin to a high-energy position.
+5. Relaxation: Ca2+ is pumped back into the sarcoplasmic reticulum. Troponin returns to original shape, allowing tropomyosin to block actin-binding sites.
+
+=== PAGE 27 ===
+MITOSIS
+Prophase: Chromosomes condense. Mitotic spindle begins to form. Nuclear envelope begins to break down.
+Prometaphase: Nuclear envelope fully breaks down. Spindle fibers attach to chromosomes at the kinetochore.
+Metaphase: Chromosomes line up at the metaphase plate. Each sister chromatid attached to spindle fibers from opposite poles.
+Anaphase: Sister chromatids separate and are pulled to opposite ends.
+Telophase: Chromosomes de-condense. Nuclear envelopes reform. Cleavage furrow begins forming.
+Result: Two genetically identical daughter cells, each diploid.
+
+=== PAGE 28 ===
+MEIOSIS I and II
+Prophase I: Homologous chromosomes pair to form tetrads. Chiasmata form where crossing over occurs.
+Metaphase I: Tetrads line up at the metaphase plate.
+Anaphase I: Homologous chromosomes pulled to opposite poles. Sister chromatids remain attached. Chromosome number reduced from diploid to haploid.
+Meiosis II: Similar to mitosis. Sister chromatids finally separated in Anaphase II.
+Result: Four genetically distinct haploid cells.
+
+=== PAGE 30 ===
+MECHANISM AND CONTROL OF SALIVARY SECRETION
+1. Initiation: Triggered by sight, smell, taste, or thought of food. Parasympathetic stimulation → high-volume, watery, enzyme-rich saliva. Sympathetic stimulation → low-volume, thick, mucous-rich saliva.
+2. Secretion by Acinar Cells: Produce primary saliva (isotonic). Contains water, electrolytes (Na+, Cl-), enzymes (alpha-amylase), and mucins.
+3. Ductal Modification: Na+ and Cl- reabsorbed; K+ and HCO3- secreted. Duct cells impermeable to water → saliva becomes hypotonic.
+4. Final Functions: Lubricates food; initiates carbohydrate digestion; buffers pH with bicarbonate; antimicrobial protection.
+
+=== PAGE 32 ===
+SWALLOWING
+1. Oral Phase (Voluntary, ~1 second): Tongue pushes the food bolus toward the oropharynx. Initiates the involuntary swallowing reflex via vagus (CN X) and glossopharyngeal (CN IX) nerves.
+2. Pharyngeal Phase (Involuntary, ~1 second): Soft palate elevates to block nasal cavity. Glottis closes and larynx elevates to protect the airway. Upper oesophageal sphincter (UOS) - Cricopharyngeus muscle - relaxes.
+3. Oesophageal Phase (Involuntary, ~10 seconds): UOS closes behind the bolus. Primary peristaltic wave moves the bolus down. Lower oesophageal sphincter (LOS) relaxes to allow entry into the stomach.
+
+=== PAGE 33 ===
+GORD & BARRETT'S OESOPHAGUS
+1. Impairment of Anti-Reflux Mechanisms: Causes include increased transient LOS relaxations, low LOS pressure (smoking), increased intra-abdominal pressure (obesity, pregnancy), hiatus hernia.
+2. Chronic Exposure of Oesophageal Mucosa: Refluxed contents cause damage to the squamous epithelium.
+3. Metaplastic Change - Barrett's Oesophagus: Stratified squamous epithelium is replaced by gastric-type simple columnar epithelium with mucus-secreting goblet cells (intestinal metaplasia).
+4. Long-term Risk: Barrett's oesophagus increases risk of dysplasia and oesophageal adenocarcinoma.
+
+=== PAGE 35 ===
+SLOW WAVES AND ACTION POTENTIALS OF THE GUT
+Interstitial cells of Cajal (ICC) are the PACEMAKERS of the GUT. They generate rhythmic slow waves across the smooth muscle of the gut which spread through gap-junctions.
+Slow waves alone don't cause contractions — only when spike potentials (action potentials) occur on top of them does contraction happen.
+Frequency of slow waves is fixed (e.g., ~3/min in the stomach), but amplitude depends on neural and hormonal input.
+
+=== PAGE 37 ===
+GASTRIC HCL SECRETION
+Cephalic Phase (~30%): Triggered by smelling, tasting, or thinking about food. Vagus nerve releases ACh → stimulates parietal cells. GRP stimulates G cells to release gastrin.
+Gastric Phase (~60%): Triggered by food entering stomach - distension and presence of amino acids/peptides. Stomach distension activates vagovagal reflexes → release ACh → stimulates parietal cells.
+Termination/Inhibition: Low pH inhibits gastrin release (below pH 3). D cells release somatostatin: inhibits G cells, ECL cells, and parietal cells directly. Secretin (from duodenum in response to acid) inhibits parietal cell activity.
+
+=== PAGE 48 ===
+INSULIN SECRETION
+Trigger: Increased plasma glucose after a meal.
+1. Glucose enters beta-cells via GLUT-2 transporters.
+2. Glucose is phosphorylated by glucokinase → Glucose-6-phosphate (G6P).
+3. G6P is oxidised to produce ATP.
+4. Increased ATP inhibits ATP-sensitive K+ channels → K+ cannot leave → Membrane depolarisation.
+5. Depolarisation opens voltage-gated Ca2+ channels → Ca2+ influx.
+6. Increased intracellular Ca2+ triggers exocytosis of insulin vesicles → Insulin is released into blood.
+
+INSULIN ACTION ON GLUCOSE METABOLISM: Promotes GLUT-4 transporter movement to surface of muscle and fat cells (increased glucose uptake). Activates glycogen synthase (increased glycogen synthesis). Inhibits liver phosphorylase (decreased glycogen breakdown). Reduces gluconeogenesis.
+
+=== PAGE 50 ===
+TYPE 1 DIABETES MELLITUS
+Pathogenesis: Autoimmune destruction of pancreatic beta-cells.
+1. Genetic & Environmental Triggers: HLA-DR3/DR4 genes. Environmental triggers include viral infections.
+2. Autoimmune Attack: Immune system produces autoantibodies (GAD, IA-2, ZnT8) that target beta-cells. T-cells infiltrate islets of Langerhans and attack beta-cells.
+3. Progressive beta-cell destruction. 
+4. Complete insulin deficiency → Glucose cannot enter cells.
+5. Hyperglycemia: Polyuria (osmotic diuresis), Polydipsia, Weight loss (body breaks down fat and muscle).
+Associated conditions: Addison's disease, Autoimmune thyroiditis, Coeliac disease.
+
+=== PAGE 51 ===
+TYPE 2 DIABETES MELLITUS
+Pathogenesis: Insulin resistance and beta-cell dysfunction.
+1. Insulin Resistance: Caused by obesity, sedentary lifestyle, visceral fat, and genetics. Tissues become less responsive to insulin.
+2. Compensatory Hyperinsulinemia: Pancreas secretes more insulin to maintain normal glucose levels (pre-diabetes stage).
+3. Beta-cell Exhaustion: Chronic overwork leads to beta-cell dysfunction and progressive beta-cell death.
+4. Reduced Insulin Secretion + Insulin Resistance → sustained hyperglycemia.
+At diagnosis, less than 50% of beta-cell function remains.
+
+=== PAGE 52 ===
+DIABETIC KETOACIDOSIS (DKA)
+1. Insulin Deficiency: No insulin = no glucose uptake into cells → body thinks it's starving.
+2. Compensatory Hormone Rise: Glucagon, Adrenaline, Cortisol → stimulate gluconeogenesis and lipolysis.
+3. Lipolysis → free fatty acids (FFAs) travel to the liver.
+4. Ketogenesis: Liver converts FFAs into ketone bodies: Acetoacetate, Beta-hydroxybutyrate, Acetone.
+5. Ketone Accumulation = Metabolic Acidosis: Ketones accumulate, lowering blood pH.
+6. Hyperglycemia Worsens: Liver makes more glucose via gluconeogenesis.
+7. Osmotic Diuresis: High glucose in blood → Polyuria, Dehydration, Electrolyte loss (Na+, K+).
+8. Clinical Signs: Kussmaul breathing (deep rapid breathing to blow off acid), Fruity breath (acetone), Vomiting, abdominal pain, confusion.
+
+=== PAGE 55 ===
+GRAVES' DISEASE (Hyperthyroidism)
+1. Autoantibodies develop: TSH receptor antibodies mimic real TSH.
+2. Thyroid is overstimulated: Antibodies bind to TSH receptor, making the thyroid secrete excessive T4 and T3.
+3. T3 is especially high.
+4. Pituitary backs off: Brain sees high hormone levels and suppresses TSH, but doesn't help — antibodies continue.
+5. Thyroid grows (goiter forms).
+Hormone levels: Increased T4, Increased T3, Decreased TSH. Type: Primary hyperthyroidism.
+
+IODINE DEFICIENCY (Hypothyroidism)
+1. Iodine intake drops → thyroid can't make enough T4 and T3.
+2. Thyroid hormone levels fall: Decreased T4, decreased T3.
+3. Pituitary increases TSH.
+4. Thyroid is overstimulated and grows → forms a goitre.
+Hormone levels: Decreased T4, Decreased T3, Increased TSH. Type: Primary hypothyroidism.
+
+=== PAGE 58 ===
+INNATE IMMUNITY
+Immediate, general protection — always on standby, no prior exposure needed.
+All immune cells come from multipotent hematopoietic stem cells in bone marrow.
+Complement system activated via three pathways: Classical (triggered by antibodies), Lectin (recognizes sugars on microbes), Alternative (direct contact with microbe).
+C3 cleaved into C3a and C3b: C3a and C5a promote inflammation; C3b tags the microbe (opsonization).
+C5b-C9 form the Membrane Attack Complex (MAC), causing lysis.
+Phagocytes (macrophages, neutrophils) recognize microbes tagged with C3b and engulf them.
+
+=== PAGE 59 ===
+ADAPTIVE IMMUNITY
+Slower to start, but highly specific and creates memory.
+B cells (mature in bone marrow) and T cells (mature in thymus).
+Dendritic cells present antigens on MHC II molecules to CD4+ helper T cells in lymph nodes.
+CD4+ T cells release cytokines to help B cells produce antibodies.
+If a virus infects a body cell, the infected cell presents viral proteins using MHC I.
+CD8+ cytotoxic T cells recognize MHC I + viral antigen and kill infected cells by triggering apoptosis.
+B cells activated by CD4+ T cells mature into plasma cells that produce antibodies.
+Some B and T cells become memory cells, giving long-term immunity.
+
+=== PAGE 61 ===
+CARDIAC ACTION POTENTIALS - CARDIOMYOCYTES
+Phase 4: Resting phase (~-90 mV). Stable because K+ slowly leaks out.
+Phase 0: Depolarization. Na+ channels open, Na+ rushes in. Inside becomes quickly more positive (up to +50 mV).
+Phase 1: Initial repolarization. Na+ channels close. Small K+ efflux. Brief downward dip.
+Phase 2: Plateau phase. Ca2+ enters slowly, K+ continues to exit. These cancel out. Ca2+ triggers contraction.
+Phase 3: Repolarization. Ca2+ stops entering. K+ flows out strongly. Resets to resting state.
+
+SA/AV NODE CELLS (PACEMAKER CELLS)
+Phase 4: Pacemaker phase. Na+ slowly leaks in, Ca2+ starts entering. Gradual rise toward threshold. Sets heart rate.
+Phase 0: Ca2+ flows in rapidly (not Na+ like in cardiomyocytes).
+Phase 3: K+ flows out, brings voltage back down.
+
+=== PAGE 62 ===
+HAEMOSTASIS AND COAGULATION CASCADE
+Primary Haemostasis:
+1. Adhesion: Platelets adhere to exposed subendothelial matrix (collagen) via von Willebrand factor (vWF).
+2. Activation: Adhered platelets change shape and release granules (ADP, thromboxane A2).
+3. Aggregation: Activated platelets bind through fibrinogen via glycoprotein IIb/IIIa (GPIIbIIIa). Forms stable platelet plug.
+
+Secondary Haemostasis:
+1. Tissue factor on subendothelial cells binds factor VII, stimulating coagulation cascade.
+2. Thrombin cleaves fibrinogen into fibrin, forming the secondary haemostatic plug.
+
+=== PAGE 65 ===
+COAGULATION PATHWAYS
+Common Pathway: Prothrombinase Complex activates Prothrombin (FII) into Thrombin. Thrombin activates Fibrinogen (FI) into Fibrin. Fibrin Stabilizing Factor (FXIII) crosslinks fibrin.
+
+Intrinsic Pathway: Damaged subendothelial collagen releases FXII → FXIIa → FXIa → FIXa → FVIIIa → FXa. Measured clinically as activated partial thromboplastin time (aPTT).
+
+Extrinsic Pathway: Tissue damage releases Tissue Factor (TF). TF activates FVII to FVIIa → FXa. Measured clinically as prothrombin time (PT).
+
+=== PAGE 61 ===
+H+ REGULATION
+Respiratory regulation: Hyperventilation reduces CO2 → carbonic acid decreases → pH rises. Hypoventilation increases CO2 → carbonic acid increases → pH falls.
+Renal regulation: Kidneys excrete or retain H+ and HCO3-. In acidosis: kidneys excrete H+ and retain HCO3-. In alkalosis: kidneys retain H+ and excrete HCO3-.
+Buffer systems: Bicarbonate buffer system; Phosphate buffer system; Protein buffer system (albumin, haemoglobin).
+
+=== PAGE 67 ===
+BLOOD PRESSURE REGULATION
+Neural control: Baroreceptors in carotid sinus and aortic arch detect stretch. High BP → increased baroreceptor firing → reduced sympathetic, increased parasympathetic → lower heart rate and vasodilation. Low BP → decreased baroreceptor firing → increased sympathetic → vasoconstriction, increased heart rate.
+Adrenal medulla: Low concentration adrenaline → vasodilation in muscles (beta-2 adrenoreceptors). High concentration adrenaline → vasoconstriction (alpha-1 adrenoreceptors).
+RAAS: Renin released by kidney (low BP/low Na+ → angiotensin II → aldosterone → Na+ and water retention → increased blood pressure).
+
+=== PAGE 73 ===
+PHOTOTRANSDUCTION
+Dark conditions: Guanylate cyclase keeps making cGMP. cGMP-gated Na+ channels stay open. Na+/Ca2+ influx keeps photoreceptor depolarized (~-30 mV). Glutamate continuously released. ON bipolar cells are inhibited; OFF bipolar cells are excited.
+
+Light conditions: Light activates rhodopsin → activates transducin (G-protein) → activates PDE → PDE breaks down cGMP → GMP. Na+ channels close → hyperpolarization (~-60 mV). Glutamate release stops. ON bipolar cells activated → signal to ganglion cells → brain sees "Light is present!"
+
+Key: Photoreceptors are "backwards" sensors — active in the dark, quiet in the light.
+
+=== PAGE 74 ===
+AUDITORY TRANSDUCTION
+1. Sound wave entry: Collected by auricle, funneled to tympanic membrane.
+2. Vibration of ossicles: Transmitted through malleus, incus, stapes.
+3. Oval window movement: Stapes transmits vibrations to oval window, creating pressure waves in perilymph.
+4. Basilar membrane displacement: High frequencies near base; low frequencies near apex.
+5. Stereocilia bending: Tip links stretch, pulling open mechanically gated ion channels, allowing K+ influx, causing depolarization.
+6. Calcium influx: Opens voltage-gated Ca2+ channels → Ca2+ influx → glutamate release.
+7. Spiral ganglion neurons excited → action potentials in auditory nerve.
+
+=== PAGE 79 ===
+WOUND HEALING PROCESS
+1. Haemostasis Phase (Minutes-Hours): Vasoconstriction. Platelets adhere and activate, releasing clotting factors. Fibrin-fibronectin clot forms. Acts as scaffold and stores growth factors (PDGF, TGF-beta, VEGF).
+2. Inflammation Phase (Hours-3 Days): Neutrophils arrive first (within 24 hours). Macrophages release cytokines, TGF-beta and VEGF. Mast cells release histamine → local vasodilation.
+3. Proliferation Phase (3 Days-Weeks): Re-epithelialization (keratinocytes migrate over fibrin clot). Granulation tissue formation (fibroblasts secrete ECM). Angiogenesis driven by VEGF.
+4. Remodelling Phase (Weeks-Months): Type III collagen replaced by Type I collagen. MMP breakdown of excess ECM. Tensile strength increases to ~80% of original skin strength.
+
+=== PAGE 85 ===
+OVARIAN CYCLE
+Follicular Phase (Days 1-14): GnRH from hypothalamus → FSH and LH from pituitary. FSH stimulates growth of ovarian follicles. Theca cells produce androstenedione → granulosa cells convert to oestradiol via aromatase. Dominant (Graafian) follicle survives. LH surge 24-36 hours before ovulation → completion of meiosis I → ovulation.
+
+Luteal Phase (Days 15-28): Ruptured follicle forms corpus luteum (via luteinisation). Corpus luteum secretes progesterone (dominant), plus oestrogen and inhibin. If fertilisation occurs: embryo releases hCG → maintains corpus luteum → continued progesterone production. If no fertilisation: corpus luteum degenerates into corpus albicans.
+
+=== PAGE 86 ===
+UTERINE (ENDOMETRIAL) CYCLE
+Menstrual Phase (Days 1-5): Triggered by drop in progesterone and oestrogen. Spiral arteries constrict → ischaemia → shedding of stratum functionalis.
+Proliferative Phase (Days 6-14): Driven by rising oestrogen. Regeneration of stratum functionalis. Cervical mucus becomes clear and stretchy.
+Secretory Phase (Days 15-28): Under influence of progesterone from corpus luteum. Endometrial glands secrete glycogen-rich fluid. Cervical mucus thickens and becomes acidic.
+
+=== PAGE 90 ===
+PCOS (Polycystic Ovary Syndrome)
+Leads to hyperinsulinaemia → decreased SHBG → increased free testosterone → increased androgen production → anovulation and menstrual disturbance.
+Key mechanism: Insulin resistance → compensatory hyperinsulinaemia → insulin stimulates theca cells to produce more androgens. Insulin tells liver to make less SHBG. More free testosterone in circulation. Excess free testosterone → acne, hirsutism, hair thinning. Insulin reduces aromatase transcription in granulosa cells → decreased correct oestrogen (17beta-oestradiol) for LH surge. Without LH surge → no ovulation. Immature follicles accumulate → polycystic appearance on ultrasound.
+
+=== PAGE 92 ===
+LABOUR
+Stage 1 - Cervical Dilation: Cytokines (IL-1, TNF-alpha) trigger inflammation, upregulating prostaglandin production. Prostaglandins (PGF2alpha, PGE2) cause cervical ripening and enhance myometrial contractions. Oxytocin coordinates uterine contractions.
+Latent Phase (0-4 cm): Irregular, mild contractions. 
+Active Phase (4-10 cm): Coordinated contractions intensify. Fundal dominance - contractions strongest at fundus, travel downward. Cervix dilates to 10 cm.
+Stage 2 - Delivery: 7 Cardinal Movements: Engagement, Descent, Flexion, Internal Rotation, Extension, External Rotation, Expulsion.
+Stage 3 - Delivery of Placenta: Oxytocin surge causes intense uterine contractions, shearing placenta off uterine wall.
+
+=== PAGE 95 ===
+DOPAMINE SYNTHESIS AND BASAL GANGLIA
+Dopamine Synthesis: Tyrosine → (Tyrosine Hydroxylase, rate-limiting enzyme) → L-DOPA → (DOPA decarboxylase) → Dopamine.
+Dopamine recycled via DAT (dopamine transporter) and repackaged using VMAT2.
+D1 Receptors (Direct Pathway): Dopamine activates Gs-coupled receptors, enhancing cAMP, exciting the direct pathway to facilitate movement.
+D2 Receptors (Indirect Pathway): Dopamine activates Gi-coupled receptors, reducing cAMP, inhibiting the indirect pathway, suppressing competing motor programs.
+Overall: Dopamine facilitates movement by stimulating the direct pathway and inhibiting the indirect pathway.
+
+=== PAGE 97 ===
+PARKINSON'S DISEASE - PROTEIN AGGREGATION
+1. Protein Misfolding: alpha-synuclein misfolds and sticks together, forming Lewy bodies (hallmark of Parkinson's Disease).
+2. Alpha-Synuclein Aggregation: Aggregates form pore-like complexes in neuronal membranes → calcium influx → toxic cascades → neuronal death.
+3. Abnormal Phosphorylation: Accelerates fibril formation.
+4. Proteasome Dysfunction: Ubiquitin-proteasome system fails (mutations in Parkin gene). Misfolded proteins accumulate.
+5. Consequences: Loss of dopaminergic neurons in substantia nigra pars compacta → decreased dopamine → motor symptoms: Bradykinesia (slowness), Rigidity (stiff muscles), Tremor.
+Summary: Protein Misfolding → Aggregation → Membrane Dysfunction → Calcium Toxicity → Proteasome Failure → Neuronal Death.
+
+=== PAGE 99 ===
+HUNTINGTON'S DISEASE
+Cause: Expanded CAG repeat in the huntingtin gene → abnormal huntingtin protein → forms inclusions in neurons.
+Pathological Features: Inclusions disrupt cellular processes (transcription, mitochondrial function). Excitotoxicity - hyperactivation of NMDA and AMPA receptors → calcium influx → neuronal death.
+Selective Loss of Medium Spiny Neurons (MSNs): Primarily affects D2 MSN receptors FIRST in the striatum. Loss of indirect pathway → reduced inhibition of involuntary movements. Hyperactivity of the direct pathway → amplifying motor output.
+Result: Hyperkinesia (excessive involuntary movements) such as chorea.
+Key Summary: Loss of indirect pathway + overactive direct pathway = increased involuntary motor activity.`;
+
+// ─────────────────────────────────────────────────────────────
+//  TOPIC DEFINITIONS
+// ─────────────────────────────────────────────────────────────
+const TOPICS = [
+  { id: 'bone',        label: 'Bone & Ossification',       icon: '🦴', pages: [1,2,3,4,5,6,7,8,9] },
+  { id: 'calcium',     label: 'Calcium & Phosphate',        icon: '🧪', pages: [11,12,13,14,15,16,17,18,19,20] },
+  { id: 'neuro',       label: 'Neurotransmission',          icon: '⚡', pages: [21,22,23,24,25,70] },
+  { id: 'cell',        label: 'Cell Cycle & Mitosis',       icon: '🔬', pages: [26,27,28] },
+  { id: 'gi',          label: 'GI Physiology',              icon: '🫁', pages: [29,30,31,32,33,34,35,36,37,38,39,40,41,42,55] },
+  { id: 'kidney',      label: 'Kidney & Electrolytes',      icon: '🫘', pages: [43,44,45,46,47,60] },
+  { id: 'diabetes',    label: 'Diabetes & Metabolism',      icon: '💉', pages: [48,49,50,51,52] },
+  { id: 'thyroid',     label: 'Thyroid & Endocrine',        icon: '🦋', pages: [53,54,82] },
+  { id: 'immune',      label: 'Immunity & Inflammation',    icon: '🛡️', pages: [56,58,59] },
+  { id: 'cardiac',     label: 'Cardiac Physiology',         icon: '❤️', pages: [60,61,62,63,64,65,67,68,69] },
+  { id: 'sensory',     label: 'Sensory Transduction',       icon: '👁️', pages: [73,74] },
+  { id: 'ageing',      label: 'Ageing & Wound Healing',     icon: '🩹', pages: [75,76,77,78,79,80] },
+  { id: 'repro',       label: 'Reproduction & Obstetrics',  icon: '🤱', pages: [81,84,85,86,87,88,89,90,91,92,93] },
+  { id: 'neuropath',   label: 'Neurodegeneration',          icon: '🧠', pages: [71,72,95,96,97,98,99] },
+];
+
+// ─────────────────────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────────────────────
+let selectedTopics = new Set(TOPICS.map(t => t.id));
+let questionMode = 'mcq';    // 'mcq' | 'free' | 'mix'
+let numQuestions = 5;
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let streak = 0;
+let bestStreak = 0;
+let answered = false;
+let conversationHistory = [];
+
+// ─────────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────────
+(function init() {
+  renderTopicGrid();
+})();
+
+function renderTopicGrid() {
+  const grid = document.getElementById('topics-grid');
+  grid.innerHTML = TOPICS.map(t => `
+    <div class="topic-chip ${selectedTopics.has(t.id) ? 'selected' : ''}"
+         onclick="toggleTopic('${t.id}')" id="chip-${t.id}">
+      <div class="icon">${t.icon}</div>
+      <div class="label">${t.label}</div>
+    </div>
+  `).join('');
+}
+
+function toggleTopic(id) {
+  if (selectedTopics.has(id)) {
+    selectedTopics.delete(id);
+  } else {
+    selectedTopics.add(id);
+  }
+  renderTopicGrid();
+  document.getElementById('start-btn').disabled = selectedTopics.size === 0;
+}
+
+function selectAll()  { selectedTopics = new Set(TOPICS.map(t => t.id)); renderTopicGrid(); }
+function selectNone() { selectedTopics.clear(); renderTopicGrid(); document.getElementById('start-btn').disabled = true; }
+
+function setMode(m) {
+  questionMode = m;
+  ['mcq','free','mix'].forEach(k => {
+    document.getElementById('mode-'+k).classList.toggle('active', k === m);
+  });
+}
+
+function setNum(n) {
+  numQuestions = n;
+  [5,10,20].forEach(k => {
+    document.getElementById('num-'+k).classList.toggle('active', k === n);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+//  QUIZ START
+// ─────────────────────────────────────────────────────────────
+async function startQuiz() {
+  if (selectedTopics.size === 0) { showToast('Select at least one topic!'); return; }
+
+  questions = [];
+  currentQ = 0;
+  score = 0;
+  streak = 0;
+  bestStreak = 0;
+  conversationHistory = [];
+
+  showScreen('quiz');
+  updateHeader();
+  await loadNextQuestion();
+}
+
+async function loadNextQuestion() {
+  showLoading(true, 'Generating question…');
+  try {
+    const q = await generateQuestion();
+    questions.push(q);
+    showLoading(false);
+    renderQuestion(q);
+  } catch (e) {
+    showLoading(false);
+    showToast('Failed to generate question. Check your connection.');
+    console.error(e);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  QUESTION GENERATION VIA CLAUDE API
+// ─────────────────────────────────────────────────────────────
+async function generateQuestion() {
+  // Pick a random topic from selected
+  const topicArr = TOPICS.filter(t => selectedTopics.has(t.id));
+  const topic = topicArr[Math.floor(Math.random() * topicArr.length)];
+
+  // Decide question type
+  let qType = questionMode;
+  if (qType === 'mix') qType = Math.random() < 0.6 ? 'mcq' : 'free';
+
+  // Get notes for this topic
+  const pages = topic.pages;
+  const notesSnippet = extractPages(pages);
+
+  const systemPrompt = `You are a medical education expert generating exam questions for Year 1 medical students studying for CTB (Clinical and Translational Biology) exams.
+
+NOTES CONTENT:
+${notesSnippet}
+
+Generate a SINGLE exam question from the above notes. Return ONLY valid JSON in exactly this format with no other text:
+
+For MCQ:
+{
+  "type": "mcq",
+  "topic": "${topic.label}",
+  "question": "The question text here",
+  "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
+  "correct": 0,
+  "explanation": "Detailed explanation of why the correct answer is right and why the others are wrong"
+}
+
+For short answer:
+{
+  "type": "free",
+  "topic": "${topic.label}",
+  "question": "The question text here",
+  "model_answer": "The key points expected in a full answer",
+  "key_points": ["Key point 1", "Key point 2", "Key point 3"]
+}
+
+Rules:
+- Questions must be directly based on the provided notes
+- MCQ options must be plausible and clinically relevant
+- correct field is 0-indexed (0 = A, 1 = B, 2 = C, 3 = D)
+- Questions should test understanding, not just memorisation
+- Avoid trivially easy or impossibly hard questions
+- Do NOT include "According to the notes" in the question
+${qType === 'mcq' ? '- Generate an MCQ question' : '- Generate a short answer question'}`;
+
+  // Build conversation (maintain history for variety)
+  conversationHistory.push({
+    role: 'user',
+    content: systemPrompt
+  });
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: conversationHistory
+    })
+  });
+
+  if (!response.ok) throw new Error(`API error: ${response.status}`);
+  const data = await response.json();
+  const raw = data.content.find(c => c.type === 'text')?.text || '';
+
+  // Add response to history so next question isn't a repeat
+  conversationHistory.push({ role: 'assistant', content: raw });
+
+  // Keep history trim (only last 6 messages)
+  if (conversationHistory.length > 6) conversationHistory = conversationHistory.slice(-6);
+
+  try {
+    const cleaned = raw.replace(/```json\n?|```\n?/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch (e) {
+    throw new Error('Could not parse question JSON: ' + raw.substring(0, 200));
+  }
+}
+
+// Extract notes pages for a topic
+function extractPages(pageNums) {
+  let result = '';
+  for (const n of pageNums) {
+    const regex = new RegExp(`=== PAGE ${n} ===\\n([\\s\\S]*?)(?===== PAGE \\d|$)`);
+    const match = NOTES.match(regex);
+    if (match) result += `=== PAGE ${n} ===\n${match[1].trim()}\n\n`;
+  }
+  return result || NOTES.substring(0, 3000);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RENDER QUESTION
+// ─────────────────────────────────────────────────────────────
+function renderQuestion(q) {
+  answered = false;
+  document.getElementById('q-topic-tag').textContent = q.topic;
+  document.getElementById('q-counter').textContent = `${currentQ + 1} / ${numQuestions}`;
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('q-note').textContent = '';
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('next-row').style.display = 'none';
+
+  const pct = (currentQ / numQuestions) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  if (q.type === 'mcq') {
+    document.getElementById('options-list').style.display = 'flex';
+    document.getElementById('free-response-area').style.display = 'none';
+    renderMCQ(q);
+  } else {
+    document.getElementById('options-list').style.display = 'none';
+    document.getElementById('free-response-area').style.display = 'flex';
+    document.getElementById('free-answer').value = '';
+    document.getElementById('free-answer').disabled = false;
+  }
+  updateHeader();
+}
+
+function renderMCQ(q) {
+  const letters = ['A','B','C','D'];
+  const list = document.getElementById('options-list');
+  list.innerHTML = q.options.map((opt, i) => `
+    <button class="option-btn" onclick="selectMCQ(${i})" id="opt-${i}">
+      <span class="opt-letter">${letters[i]}</span>
+      <span>${opt}</span>
+    </button>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+//  MCQ SELECTION
+// ─────────────────────────────────────────────────────────────
+function selectMCQ(selected) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const correct = q.correct;
+  const isCorrect = selected === correct;
+
+  // Style buttons
+  for (let i = 0; i < q.options.length; i++) {
+    const btn = document.getElementById('opt-' + i);
+    btn.disabled = true;
+    if (i === correct) btn.classList.add('correct');
+    else if (i === selected && !isCorrect) btn.classList.add('wrong');
+    else btn.classList.add('dimmed');
+  }
+
+  handleResult(isCorrect, q.explanation, q.options[correct]);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  FREE RESPONSE SUBMISSION
+// ─────────────────────────────────────────────────────────────
+async function submitFreeAnswer() {
+  if (answered) return;
+  const answer = document.getElementById('free-answer').value.trim();
+  if (!answer) { showToast('Please write an answer first'); return; }
+
+  answered = true;
+  document.getElementById('free-answer').disabled = true;
+
+  showLoading(true, 'Grading your answer…');
+
+  const q = questions[currentQ];
+  try {
+    const feedback = await gradeAnswer(q, answer);
+    showLoading(false);
+    handleFreeResult(feedback);
+  } catch (e) {
+    showLoading(false);
+    showToast('Error grading answer. Try again.');
+    answered = false;
+    document.getElementById('free-answer').disabled = false;
+  }
+}
+
+async function gradeAnswer(q, userAnswer) {
+  const prompt = `You are grading a Year 1 medical student's short answer exam response.
+
+QUESTION: ${q.question}
+
+MODEL ANSWER / KEY POINTS:
+${q.model_answer}
+Key points: ${q.key_points.join(', ')}
+
+STUDENT'S ANSWER: ${userAnswer}
+
+Grade this answer and return ONLY valid JSON with no other text:
+{
+  "score": "correct" | "partial" | "wrong",
+  "feedback": "Specific, encouraging feedback in 1-2 sentences",
+  "missed": ["Any key points the student missed"],
+  "correct_points": ["Key points the student got right"]
+}
+
+Be fair but accurate. Partial credit if they got the main concept but missed details.`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error('API error');
+  const data = await response.json();
+  const raw = data.content.find(c => c.type === 'text')?.text || '';
+  const cleaned = raw.replace(/```json\n?|```\n?/g, '').trim();
+  return JSON.parse(cleaned);
+}
+
+function handleFreeResult(feedback) {
+  const isCorrect  = feedback.score === 'correct';
+  const isPartial  = feedback.score === 'partial';
+
+  updateScore(isCorrect, isPartial);
+
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+  panel.className = 'result-panel ' + feedback.score;
+
+  const icons = { correct: '✅', partial: '🟡', wrong: '❌' };
+  const titles = { correct: 'Correct!', partial: 'Partially Correct', wrong: 'Not quite' };
+
+  document.getElementById('result-icon').textContent = icons[feedback.score];
+  document.getElementById('result-title').textContent = titles[feedback.score];
+
+  let body = `<p>${feedback.feedback}</p>`;
+  if (feedback.missed && feedback.missed.length > 0) {
+    body += `<p style="margin-top:0.6rem"><strong>Missed points:</strong> ${feedback.missed.join('; ')}</p>`;
+  }
+  document.getElementById('result-body').innerHTML = body;
+
+  document.getElementById('next-row').style.display = 'flex';
+  showStreakFeedback(isCorrect);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RESULT HANDLING (MCQ)
+// ─────────────────────────────────────────────────────────────
+function handleResult(isCorrect, explanation, correctAnswer) {
+  updateScore(isCorrect, false);
+
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+  panel.className = 'result-panel ' + (isCorrect ? 'correct' : 'wrong');
+
+  document.getElementById('result-icon').textContent = isCorrect ? '✅' : '❌';
+  document.getElementById('result-title').textContent = isCorrect ? 'Correct!' : 'Not quite';
+
+  let body = '';
+  if (!isCorrect) body += `<p><strong>Correct answer:</strong> ${correctAnswer}</p>`;
+  if (explanation) body += `<p style="margin-top:${isCorrect?'0':'0.6rem'}">${explanation}</p>`;
+  document.getElementById('result-body').innerHTML = body;
+
+  document.getElementById('next-row').style.display = 'flex';
+  showStreakFeedback(isCorrect);
+}
+
+function updateScore(isCorrect, isPartial) {
+  if (isCorrect) {
+    score++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+  } else if (isPartial) {
+    // Partial: 0.5 but we keep it simple — count as partial in display only
+    streak = 0;
+  } else {
+    streak = 0;
+  }
+  updateHeader();
+}
+
+function showStreakFeedback(isCorrect) {
+  if (streak >= 3 && isCorrect) showToast(`🔥 ${streak} in a row!`);
+  else if (isCorrect) showToast('✓ Good work!');
+}
+
+// ─────────────────────────────────────────────────────────────
+//  NAVIGATION
+// ─────────────────────────────────────────────────────────────
+async function nextQuestion() {
+  currentQ++;
+  if (currentQ >= numQuestions) {
+    showResults();
+    return;
+  }
+  document.getElementById('next-row').style.display = 'none';
+  document.getElementById('result-panel').style.display = 'none';
+  await loadNextQuestion();
+}
+
+function skipQuestion() {
+  if (!answered) {
+    streak = 0;
+    updateHeader();
+  }
+  nextQuestion();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RESULTS
+// ─────────────────────────────────────────────────────────────
+function showResults() {
+  showScreen('results');
+  const pct = Math.round((score / numQuestions) * 100);
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('stat-correct').textContent = score;
+  document.getElementById('stat-wrong').textContent = numQuestions - score;
+  document.getElementById('stat-streak').textContent = bestStreak;
+
+  // Animate arc
+  const circumference = 314;
+  const offset = circumference - (pct / 100) * circumference;
+  setTimeout(() => {
+    document.getElementById('score-arc').style.strokeDashoffset = offset;
+    const arc = document.getElementById('score-arc');
+    if (pct >= 80) arc.style.stroke = '#2ecc8a';
+    else if (pct >= 50) arc.style.stroke = '#f5a623';
+    else arc.style.stroke = '#f05a5a';
+  }, 100);
+
+  let emoji, msg;
+  if (pct >= 90) { emoji = '🏆'; msg = "Outstanding! You clearly know this material well."; }
+  else if (pct >= 75) { emoji = '🎉'; msg = "Great job! Review the ones you missed and you'll nail the exam."; }
+  else if (pct >= 50) { emoji = '📚'; msg = "Good effort — keep reviewing and you'll get there!"; }
+  else { emoji = '💪'; msg = "More practice needed, but you're on the right track. Review your notes and try again!"; }
+
+  document.getElementById('results-emoji').textContent = emoji;
+  document.getElementById('results-msg').textContent = msg;
+}
+
+function goHome() {
+  showScreen('home');
+  document.getElementById('progress-fill').style.width = '0%';
+}
+
+// ─────────────────────────────────────────────────────────────
+//  UI HELPERS
+// ─────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.getElementById('home-screen').style.display  = name === 'home'    ? 'block' : 'none';
+  document.getElementById('quiz-screen').style.display  = name === 'quiz'    ? 'block' : 'none';
+  document.getElementById('results-screen').style.display = name === 'results' ? 'block' : 'none';
+}
+
+function updateHeader() {
+  document.getElementById('hdr-q').textContent = `Q ${currentQ + (questions.length > 0 ? 1 : 0)}/${numQuestions}`;
+  document.getElementById('hdr-score').textContent = `Score: ${score}`;
+  const badge = document.getElementById('streak-badge');
+  if (streak >= 2) {
+    badge.style.display = 'inline-flex';
+    badge.textContent = `🔥 ${streak}`;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function showLoading(show, msg = '') {
+  const overlay = document.getElementById('loading-overlay');
+  overlay.style.display = show ? 'flex' : 'none';
+  if (msg) document.getElementById('loading-msg').textContent = msg;
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
